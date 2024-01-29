@@ -1,14 +1,24 @@
 import React from "react";
 import { useState } from "react";
 import "../styles/Login.css";
+import Authentication from "../services/Authentication";
+
+let auth = new Authentication();
 
 function Login() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    console.log(userName, password);
+  const handleLogin = async (formValues) => {
+    const { userName, password } = formValues;
+    try {
+      await auth.login(userName, password);
+      history.push("/home");
+    } catch (error) {
+      console.log(error);
+    }
+    // event.preventDefault();
+    // console.log(userName, password);
   };
   return (
     <div className="login-page">
