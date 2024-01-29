@@ -1,55 +1,73 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import "../styles/Login.css";
-import Authentication from "../services/Authentication";
+import Authentication from "../services/Authentication/index";
 
-let auth = new Authentication();
+const auth = new Authentication();
 
 function Login() {
-  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = async (formValues) => {
-    const { userName, password } = formValues;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
-      await auth.login(userName, password);
-      history.push("/home");
+      await auth.login({ email, password });
+      setIsLoggedIn(true);
+      setEmail("");
+      setPassword("");
     } catch (error) {
-      console.log(error);
+      // eslint-disable-next-line no-console
+      console.error(error);
+      setEmail("");
+      setPassword("");
     }
-    // event.preventDefault();
-    // console.log(userName, password);
   };
+
+  const showWelcomeMessage = () => {
+    return (
+      <div className="welcome-message">
+        <h1>Welcome back!</h1>
+        <button
+          type="button"
+          onClick={() => {
+            auth.logout();
+            setIsLoggedIn(false);
+          }}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="login-page">
-      <form onSubmit={handleLogin}>
-        <label htmlFor="username">
-          Username
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={userName}
-            onChange={(event) => {
-              setUserName(event.target.value);
-            }}
-          />
-        </label>
-        <label htmlFor="password">
+      {isLoggedIn ? (
+        showWelcomeMessage()
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">
+            Email
+            <input
+              type="text"
+              name="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </label>
+          <label htmlFor="password">
             Password
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-          />
-        </label>
-
-        <button type="submit">Login</button>
-      </form>
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </label>
+          <button type="submit">Login</button>
+        </form>
+      )}
     </div>
   );
 }

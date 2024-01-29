@@ -1,5 +1,6 @@
-const users = {
-    
-}
+const user = {
+  login: () => `/login`,
+  register: () => `/register`,
+};
 
-export default {users};
+export default user;

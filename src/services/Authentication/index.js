@@ -1,9 +1,12 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-else-return */
 import axios from "axios";
-import { user } from "constants/endpoints";
+import user from "../../constants/endpoints";
 import parseJWTPayload from "./utils/parseJWTPayload";
 
 class Authentication {
-  login({ email, password, captcha }) {
+  login({ email, password }) {
     const loginEndpoint = user.login();
     const { REACT_APP_API_BASE_URL: API_BASE_URL } = process.env;
     return axios(`${API_BASE_URL}${loginEndpoint}`, {
@@ -11,7 +14,6 @@ class Authentication {
       data: {
         email,
         password,
-        captcha,
       },
     }).then((response) => {
       const accessToken = response.data.accessToken;
@@ -19,15 +21,9 @@ class Authentication {
     });
   }
 
-  loginWithAdamos(token) {
-    localStorage.setItem("creds", token);
-  }
-
   logout() {
     localStorage.removeItem("creds");
   }
-
-  register() {}
 
   isAuthenticated() {
     let hasAccessTokenExpired;
@@ -53,8 +49,10 @@ class Authentication {
 
   getAccessTokenPayload() {
     const accessToken = this.getAccessToken();
-    const parsedToken = parseJWTPayload(accessToken);
-    return parsedToken;
+    if (accessToken) {
+      return parseJWTPayload(accessToken);
+    }
+    return null;
   }
 }
 
